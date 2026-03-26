@@ -1,0 +1,74 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: API-GATEWAY
+
+  cloud:
+    gateway:
+      routes:
+
+        - id: user-service-route
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/users/**
+          filters:
+            - RewritePath=/users/(?<segment>.*), /${segment}
+
+        - id: startup-service-route
+          uri: lb://STARTUP-SERVICE
+          predicates:
+            - Path=/startups/**
+          filters:
+            - RewritePath=/startups/(?<segment>.*), /${segment}
+
+        - id: investment-service-route
+          uri: lb://INVESTMENT-SERVICE
+          predicates:
+            - Path=/investments/**
+          filters:
+            - RewritePath=/investments/(?<segment>.*), /${segment}
+
+        - id: auth-service-route
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/**
+          filters:
+            - RewritePath=/auth/(?<segment>.*), /${segment}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  secret: founderlink-super-secret-key-2024-minimum-32chars
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: Auth Service
+        url: /auth/api-docs
+      - name: User Service
+        url: /users/api-docs
+      - name: Startup Service
+        url: /startups/api-docs
+      - name: Investment Service
+        url: /investments/api-docs
+
+  api-docs:
+    enabled: true
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
