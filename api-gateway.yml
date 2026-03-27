@@ -18,25 +18,38 @@ spring:
               - OPTIONS
             allowedHeaders: "*"
       routes:
+        spring:
+  cloud:
+    gateway:
+      routes:
+
         - id: user-service-route
           uri: lb://USER-SERVICE
           predicates:
             - Path=/users/**
-
-        - id: startup-service-route
-          uri: lb://STARTUP-SERVICE
-          predicates:
-            - Path=/startups/**
-
-        - id: investment-service-route
-          uri: lb://INVESTMENT-SERVICE
-          predicates:
-            - Path=/investments/**
+          filters:
+            - StripPrefix=1
 
         - id: auth-service-route
           uri: lb://AUTH-SERVICE
           predicates:
             - Path=/auth/**
+          filters:
+            - StripPrefix=1
+
+        - id: startup-service-route
+          uri: lb://STARTUP-SERVICE
+          predicates:
+            - Path=/startups/**
+          filters:
+            - StripPrefix=1
+
+        - id: investment-service-route
+          uri: lb://INVESTMENT-SERVICE
+          predicates:
+            - Path=/investments/**
+          filters:
+            - StripPrefix=1
 
 eureka:
   client:
