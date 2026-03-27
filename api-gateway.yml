@@ -53,13 +53,13 @@ springdoc:
     path: /swagger-ui.html
     urls:
       - name: Auth Service
-        url: /auth/api-docs
+        url: /auth/v3/api-docs
       - name: User Service
-        url: /users/api-docs
+        url: /users/v3/api-docs
       - name: Startup Service
-        url: /startups/api-docs
+        url: /startups/v3/api-docs
       - name: Investment Service
-        url: /investments/api-docs
+        url: /investments/v3/api-docs
   api-docs:
     enabled: false
 
