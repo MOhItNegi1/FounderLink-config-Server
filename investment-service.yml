@@ -2,15 +2,11 @@ server:
   port: 8083
 
 spring:
-  application:
-    name: INVESTMENT-SERVICE
-
   datasource:
     url: jdbc:postgresql://localhost:5432/founderlink_investments
     username: postgres
     password: 9999
     driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -30,12 +26,13 @@ eureka:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
 
 management:
   tracing:
     sampling:
       probability: 1.0
-
   zipkin:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans
