@@ -2,13 +2,7 @@ server:
   port: 8080
 
 spring:
-  application:
-    name: API-GATEWAY
-
   cloud:
-    config:
-      fail-fast: false
-
     gateway:
       globalcors:
         corsConfigurations:
@@ -21,19 +15,19 @@ spring:
               - DELETE
               - OPTIONS
             allowedHeaders: "*"
-
       routes:
-        - id: user-service-route
-          uri: lb://USER-SERVICE
-          predicates:
-            - Path=/users/**
-          filters:
-            - StripPrefix=1
-
+        # ===== BUSINESS ROUTES =====
         - id: auth-service-route
           uri: lb://AUTH-SERVICE
           predicates:
             - Path=/auth/**
+          filters:
+            - StripPrefix=1
+
+        - id: user-service-route
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/users/**
           filters:
             - StripPrefix=1
 
@@ -51,6 +45,37 @@ spring:
           filters:
             - StripPrefix=1
 
+        # ===== AGGREGATED SWAGGER — api-docs proxy routes =====
+        # Gateway proxies each service's /v3/api-docs so the
+        # aggregated Swagger UI at :8080/swagger-ui.html can load them.
+        - id: auth-service-apidocs
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/v3/api-docs
+          filters:
+            - StripPrefix=1
+
+        - id: user-service-apidocs
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/users/v3/api-docs
+          filters:
+            - StripPrefix=1
+
+        - id: startup-service-apidocs
+          uri: lb://STARTUP-SERVICE
+          predicates:
+            - Path=/startups/v3/api-docs
+          filters:
+            - StripPrefix=1
+
+        - id: investment-service-apidocs
+          uri: lb://INVESTMENT-SERVICE
+          predicates:
+            - Path=/investments/v3/api-docs
+          filters:
+            - StripPrefix=1
+
 eureka:
   client:
     service-url:
@@ -61,6 +86,9 @@ eureka:
 jwt:
   secret: founderlink-super-secret-key-2024-minimum-32chars
 
+# ===== AGGREGATED SWAGGER UI =====
+# Visit: http://localhost:8080/swagger-ui.html
+# Use the dropdown (top-right) to switch between services.
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -73,15 +101,14 @@ springdoc:
         url: /startups/v3/api-docs
       - name: Investment Service
         url: /investments/v3/api-docs
-
   api-docs:
-    enabled: false
+    enabled: true
 
+# ===== ZIPKIN DISTRIBUTED TRACING =====
 management:
   tracing:
     sampling:
       probability: 1.0
-
   zipkin:
     tracing:
       endpoint: http://localhost:9411/api/v2/spans
